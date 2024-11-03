@@ -85,7 +85,7 @@ def run_fn(fn_args: FnArgs) -> None:
     early_stopping_callback = tf.keras.callbacks.EarlyStopping(
         monitor='val_accuracy',
         min_delta=0.01, 
-        patience=20,
+        patience=10,
         restore_best_weights=True
     )
     plateau_callback = tf.keras.callbacks.ReduceLROnPlateau(
@@ -96,8 +96,8 @@ def run_fn(fn_args: FnArgs) -> None:
         min_lr=0.001
     )
     tf_transform_output = tft.TFTransformOutput(fn_args.transform_output)
-    train_set = input_fn(fn_args.train_files, tf_transform_output, 20)
-    val_set =  input_fn(fn_args.eval_files, tf_transform_output, 20)
+    train_set = input_fn(fn_args.train_files, tf_transform_output, 10)
+    val_set =  input_fn(fn_args.eval_files, tf_transform_output, 10)
     model = model_builder()
     model.fit(
         train_set,
@@ -105,12 +105,15 @@ def run_fn(fn_args: FnArgs) -> None:
         validation_data=val_set,
         validation_steps=fn_args.eval_steps,
         callbacks=[tensorboard_callback, early_stopping_callback, plateau_callback],
-        epochs=20
+        epochs=10
     )
     signatures = {
-        "serving_default": _get_serve_tf_examples_fn(
-            model, tf_transform_output,
-        )
+        'serving_default':
+        _get_serve_tf_examples_fn(model, tf_transform_output).get_concrete_function(
+                                    tf.TensorSpec(
+                                    shape=[None],
+                                    dtype=tf.string,
+                                    name='examples'))
     }
 
     model.save(fn_args.serving_model_dir, save_format='tf', signatures=signatures)

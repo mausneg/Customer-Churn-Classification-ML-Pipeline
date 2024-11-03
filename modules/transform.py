@@ -16,7 +16,7 @@ def transformed_name(key):
 def preprocessing_fn(inputs):
     outputs = {}
     for key in NUMERIC_FEATURE_KEY:
-        outputs[transformed_name(key)] = tft.scale_to_z_score(inputs[key])
+        outputs[transformed_name(key)] = tft.scale_to_0_1(inputs[key])
 
     for key, value in CATEGORICAL_FEATURE_KEY.items():
         integerized = tft.compute_and_apply_vocabulary(inputs[key], vocab_filename=key)
