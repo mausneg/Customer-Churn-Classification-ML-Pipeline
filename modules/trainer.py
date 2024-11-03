@@ -38,9 +38,9 @@ def model_builder():
     inputs = tf.keras.layers.concatenate(input_features)
     print(inputs)  
     x = tf.keras.layers.Dense(64, activation='relu')(inputs)
-    x = tf.keras.layers.Dropout(0.2)(x)
+    x = tf.keras.layers.Dropout(0.5)(x)
     x = tf.keras.layers.Dense(32, activation='relu')(x)
-    x = tf.keras.layers.Dropout(0.2)(x)
+    x = tf.keras.layers.Dropout(0.5)(x)
     outputs = tf.keras.layers.Dense(1, activation='sigmoid')(x)
 
     model = tf.keras.Model(inputs=input_features, outputs=outputs)
@@ -85,7 +85,7 @@ def run_fn(fn_args: FnArgs) -> None:
     early_stopping_callback = tf.keras.callbacks.EarlyStopping(
         monitor='val_accuracy',
         min_delta=0.01, 
-        patience=10,
+        patience=20,
         restore_best_weights=True
     )
     plateau_callback = tf.keras.callbacks.ReduceLROnPlateau(
@@ -96,8 +96,8 @@ def run_fn(fn_args: FnArgs) -> None:
         min_lr=0.001
     )
     tf_transform_output = tft.TFTransformOutput(fn_args.transform_output)
-    train_set = input_fn(fn_args.train_files, tf_transform_output, 10)
-    val_set =  input_fn(fn_args.eval_files, tf_transform_output, 10)
+    train_set = input_fn(fn_args.train_files, tf_transform_output, 50)
+    val_set =  input_fn(fn_args.eval_files, tf_transform_output, 50)
     model = model_builder()
     model.fit(
         train_set,
@@ -105,7 +105,7 @@ def run_fn(fn_args: FnArgs) -> None:
         validation_data=val_set,
         validation_steps=fn_args.eval_steps,
         callbacks=[tensorboard_callback, early_stopping_callback, plateau_callback],
-        epochs=10
+        epochs=50
     )
     signatures = {
         'serving_default':
