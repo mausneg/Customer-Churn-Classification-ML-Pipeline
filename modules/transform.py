@@ -10,7 +10,7 @@ CATEGORICAL_FEATURE_KEY = {
 LABEL_KEY = 'Churn'
         
 def transformed_name(key):
-    return key + '_xf'
+    return key.replace(' ', '_').lower() + '_xf'
 
 
 def preprocessing_fn(inputs):

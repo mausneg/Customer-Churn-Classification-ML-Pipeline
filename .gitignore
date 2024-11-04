@@ -4,3 +4,4 @@ _wheels/
 pipelines/
 __pycache__/
 model.png
+serving_model_dir/

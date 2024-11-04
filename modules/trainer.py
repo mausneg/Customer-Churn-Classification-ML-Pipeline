@@ -46,8 +46,8 @@ def model_builder():
     model = tf.keras.Model(inputs=input_features, outputs=outputs)
     model.compile(
         loss='binary_crossentropy',
-        optimizer=tf.keras.optimizers.Adam(),
-        metrics=['accuracy']
+        optimizer=tf.keras.optimizers.Adam(0.001),
+        metrics=tf.keras.metrics.BinaryAccuracy()
     )
     model.summary()
     tf.keras.utils.plot_model(model, show_shapes=True)
@@ -83,28 +83,34 @@ def run_fn(fn_args: FnArgs) -> None:
         update_freq='batch'
     )
     early_stopping_callback = tf.keras.callbacks.EarlyStopping(
-        monitor='val_accuracy',
+        monitor='val_loss',
         min_delta=0.01, 
-        patience=20,
+        patience=40,
         restore_best_weights=True
     )
     plateau_callback = tf.keras.callbacks.ReduceLROnPlateau(
         monitor='val_loss',
         factor=0.1,
         min_delta=0.01,
-        patience=10,
-        min_lr=0.001
+        patience=5,
+        min_lr=0.00001
+    )
+    model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath=fn_args.serving_model_dir,
+        monitor='val_loss',
+        mode='max',
+        save_best_only=True
     )
     tf_transform_output = tft.TFTransformOutput(fn_args.transform_output)
-    train_set = input_fn(fn_args.train_files, tf_transform_output, 50)
-    val_set =  input_fn(fn_args.eval_files, tf_transform_output, 50)
+    train_set = input_fn(fn_args.train_files, tf_transform_output, num_epocs=50, batch_size=512)
+    val_set =  input_fn(fn_args.eval_files, tf_transform_output, num_epocs=50, batch_size=512)
     model = model_builder()
     model.fit(
         train_set,
         steps_per_epoch=fn_args.train_steps,
         validation_data=val_set,
         validation_steps=fn_args.eval_steps,
-        callbacks=[tensorboard_callback, early_stopping_callback, plateau_callback],
+        callbacks=[tensorboard_callback, early_stopping_callback, plateau_callback, model_checkpoint_callback],
         epochs=50
     )
     signatures = {
