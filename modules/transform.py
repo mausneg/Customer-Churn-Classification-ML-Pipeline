@@ -14,6 +14,7 @@ def transformed_name(key):
 
 
 def preprocessing_fn(inputs):
+    print(inputs)
     outputs = {}
     for key in NUMERIC_FEATURE_KEY:
         outputs[transformed_name(key)] = tft.scale_to_0_1(inputs[key])
