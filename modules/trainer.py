@@ -42,6 +42,7 @@ def model_builder(hp):
     x = tf.keras.layers.concatenate(inputs)
     for i in range(hp['num_layers']):
         x = tf.keras.layers.Dense(units=hp['units_' + str(i)], activation='relu')(x)
+        x = tf.keras.layers.BatchNormalization()(x)
         x = tf.keras.layers.Dropout(rate=hp['dropout_' + str(i)])(x)
     outputs = tf.keras.layers.Dense(1, activation='sigmoid')(x)
     model = tf.keras.Model(inputs=inputs, outputs=outputs)

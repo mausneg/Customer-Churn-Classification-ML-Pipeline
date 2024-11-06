@@ -46,9 +46,10 @@ def build_model(hp):
         inputs.append(tf.keras.layers.Input(shape=(dim,), name=transformed_name(key)))
 
     x = tf.keras.layers.concatenate(inputs)
-    for i in range(hp.Int('num_layers', 1, 3)):
+    for i in range(hp.Int('num_layers', 1, 4)):
         x = tf.keras.layers.Dense(units=hp.Int('units_' + str(i), min_value=32, max_value=512, step=32), activation='relu')(x)
-        x = tf.keras.layers.Dropout(rate=hp.Float('dropout_' + str(i), 0.1, 0.5, step=0.1))(x)
+        x = tf.keras.layers.BatchNormalization()(x)
+        x = tf.keras.layers.Dropout(rate=hp.Float('dropout_' + str(i), 0.2, 0.5, step=0.1))(x)
 
     outputs = tf.keras.layers.Dense(1, activation='sigmoid')(x)
     model = tf.keras.Model(inputs=inputs, outputs=outputs)
@@ -83,7 +84,7 @@ def tuner_fn(fn_args: FnArgs):
         project_name='churn',
     )
 
-    tuner.oracle.max_trials = 10
+    tuner.oracle.max_trials = 20
 
     return TunerFnResult(
         tuner=tuner,
