@@ -1,7 +1,8 @@
 data/
 .venv/
 _wheels/
-pipelines/
-__pycache__/
-model.png
+mausneg-pipeline/
+*__pycache__/
+*.pyc
+*.png
 serving_model_dir/
