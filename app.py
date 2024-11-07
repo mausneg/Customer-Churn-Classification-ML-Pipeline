@@ -9,10 +9,10 @@ from tfx.dsl.input_resolution.strategies.latest_blessed_model_strategy import La
 from tfx.types import Channel
 from tfx.types.standard_artifacts import Model, ModelBlessing
 
-PIPELINE_NAME = 'churn-pipeline'
+PIPELINE_NAME = 'mausneg-pipeline'
 SCHEMA_PIPELINE_NAME = 'churn-tfdv-schema'
 
-PIPELINE_ROOT = os.path.join('mausneg-pipeline', PIPELINE_NAME)
+PIPELINE_ROOT = os.path.join('pipelines', PIPELINE_NAME)
 METADATA_PATH = os.path.join('metadata', PIPELINE_NAME, 'metadata.db')
 SERVING_MODEL_DIR = os.path.join('serving_model', PIPELINE_NAME)
 

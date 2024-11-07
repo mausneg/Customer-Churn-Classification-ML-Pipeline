@@ -84,7 +84,7 @@ def tuner_fn(fn_args: FnArgs):
         project_name='churn',
     )
 
-    tuner.oracle.max_trials = 20
+    tuner.oracle.max_trials = 30
 
     return TunerFnResult(
         tuner=tuner,
